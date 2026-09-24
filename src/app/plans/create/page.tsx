@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation"
+import { useRouter } from "next/navigation";
 import { createPlan } from "@/services/auth";
 import { getSession } from "@/services/session";
-import { saveSession } from "@/services/session";
 
 export default function CreatePlanPage() {
   const router = useRouter();
@@ -43,22 +42,29 @@ export default function CreatePlanPage() {
     }
 
     try {
-      const idsession = getSession()["id"] || "";
-      const planData = {
-        name: nombre,
-        description: descripcion,
-        estimatedPrice: parseFloat(precio),
-        estimatedTime: parseInt(duracion),
-        recommendations: recomendaciones,
-        address: direccion,
-        image: foto,
-      };
+      const idsession = getSession().id;
+      if (!idsession) {
+        setError("Debes iniciar sesión para crear un plan");
+        return;
+      }
 
-      const newPlan = await createPlan(idsession, planData);
+      const name = nombre;
+      const description = descripcion;
+      const estimatedPrice = parseFloat(precio);
+      const estimatedTime = parseInt(duracion);
+      const recommendations = recomendaciones;
+      const address = direccion;
+      const image = foto;
+
+      console.log("Datos del plan a enviar:", { name, description, estimatedPrice, estimatedTime, recommendations, address, image });
+      console.log("ID de sesión:", idsession);
+
+      const newPlan = await createPlan(idsession, name, description, estimatedPrice, estimatedTime, recommendations, address, image);
       console.log("Plan creado:", newPlan);
+      router.push("/plans");
     } catch (error) {
       console.error("Error al crear el plan:", error);
-      setError("Error al crear el plan");
+      setError(error instanceof Error ? error.message : "Error al crear el plan");
     }
 
 
@@ -160,7 +166,7 @@ export default function CreatePlanPage() {
                   name="recomendaciones"
                   value={recomendaciones}
                   onChange={(e) => setRecomendaciones(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py=3 mt=1 outline-none"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 mt-1 outline-none"
                 />
         
             {error && <p className="text-sm text-red-600 mt-4">{error}</p>}

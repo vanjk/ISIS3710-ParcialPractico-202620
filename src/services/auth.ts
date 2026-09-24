@@ -40,24 +40,27 @@ export async function register(
   return data.id;
 }
 
-export async function createPlan(id: string, planData: {
-    name: string;
-    description: string;
-    estimatedPrice: number;
-    estimatedTime: number;
-    recommendations: string;
-    address: string;
-    image: string;
-  }) {
-    const response = await fetch("${API_URL}/plans", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...planData, userId: id }),
-    });
+export async function createPlan(id: string, name: string, description: string, estimatedPrice: number, estimatedTime: number, recommendations: string, address: string, image: string) {
+  const response = await fetch(`${API_URL}/plans`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name,
+      description,
+      estimatedPrice,
+      estimatedTime,
+      recommendations,
+      address,
+      image,
+      userId: id
+    }),
+  });
 
-    if (!response.ok) {
-      throw new Error("No se pudo crear el plan");
-    }
+  const data = await response.json();
 
-    return response.json();
+  if (!response.ok) {
+    throw new Error(data.message || "No se pudo crear el plan");
+  }
+
+  return data;
   }
