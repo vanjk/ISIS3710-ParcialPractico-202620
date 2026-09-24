@@ -39,3 +39,25 @@ export async function register(
 
   return data.id;
 }
+
+export async function createPlan(id: string, planData: {
+    name: string;
+    description: string;
+    estimatedPrice: number;
+    estimatedTime: number;
+    recommendations: string;
+    address: string;
+    image: string;
+  }) {
+    const response = await fetch("${API_URL}/plans", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...planData, userId: id }),
+    });
+
+    if (!response.ok) {
+      throw new Error("No se pudo crear el plan");
+    }
+
+    return response.json();
+  }
